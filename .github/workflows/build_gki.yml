@@ -1,4 +1,4 @@
-name: Build Absolute Max GKI Kernel (5.10.237-android12-9) for Tecno Pova 6 Neo
+name: Build Absolute Max GKI Kernel (5.10.237-android12-9)
 
 on:
   workflow_dispatch:
@@ -26,7 +26,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y repo clang lld llvm git-core gnupg flex bison build-essential zip curl zlib1g-dev libc6-dev-i386 libncurses5 x11proto-core-dev libx11-dev lib32z1-dev libgl1-mesa-dev libxml2-utils xsltproc unzip fontconfig python3 python-is-python3 cpio bc libssl-dev libelf-dev dwarves ccache zstd lz4
 
-      - name: Sync Google AOSP GKI android12-5.10 & Prebuilt Clang
+      - name: Sync Google AOSP GKI android12-5.10
         run: |
           mkdir -p ~/gki_build && cd ~/gki_build
           git config --global user.name "RedFox-Dev"
@@ -36,54 +36,31 @@ jobs:
           repo init -u "$MANIFEST_URL" -b common-android12-5.10-lts --depth=1
           repo sync -c --no-tags --no-clone-bundle -j$(nproc --all)
 
+      - name: Integrate KernelSU-Next
         run: |
           cd ~/gki_build/common
           KSU_URL=$(python3 -c 'print("https://" + "github" + ".com/rifsxd/KernelSU-Next.git")')
           git clone --depth=1 "$KSU_URL" KernelSU-Next
           bash KernelSU-Next/kernel/setup.sh
-          if [ -d ~/susfs4ksu/kernel_patches ]; then
-            cp -r ~/susfs4ksu/kernel_patches/fs/* fs/ || true
-            cp -r ~/susfs4ksu/kernel_patches/include/linux/* include/linux/ || true
-            patch -p1 < ~/susfs4ksu/kernel_patches/50_add_susfs_in_gki-android12-5.10.patch || true
-            if [ -d ~/susfs4ksu/kernel_patches/KernelSU ]; then
-              cd KernelSU-Next
-              for p in ~/susfs4ksu/kernel_patches/KernelSU/*.patch; do
-                patch -p1 < "$p" || true
-              done
-              cd ~/gki_build/common
-            fi
-          fi
 
-      - name: Enable Absolute Max Feature Set
+      - name: Enable MaxOut Features (BBR, CAKE, WireGuard, TPROXY, ZSTD, LZ4HC, BFQ, NTFS3, USB Net)
         run: |
           cd ~/gki_build/common
           ./scripts/config --file arch/arm64/configs/gki_defconfig \
-            -e CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE \
-            -e CONFIG_POSIX_MQUEUE \
-            -e CONFIG_TMPFS_XATTR \
             -e CONFIG_KSU \
             -e CONFIG_TCP_CONG_ADVANCED \
             -e CONFIG_TCP_CONG_BBR \
-            -e CONFIG_TCP_CONG_WESTWOOD \
-            -e CONFIG_TCP_CONG_HTCP \
-            -e CONFIG_TCP_CONG_BIC \
             -e CONFIG_DEFAULT_BBR \
+            -e CONFIG_NET_SCH_FQ_CODEL \
+            -e CONFIG_NET_SCH_CAKE \
+            -e CONFIG_DEFAULT_FQ_CODEL \
             -e CONFIG_WIREGUARD \
             -e CONFIG_IP_SET \
             -e CONFIG_NETFILTER_XT_TARGET_HL \
             -e CONFIG_NETFILTER_XT_TARGET_TPROXY \
             -e CONFIG_NETFILTER_XT_TARGET_CONNMARK \
             -e CONFIG_NETFILTER_XT_MATCH_CONNMARK \
-            -e CONFIG_NET_SCH_FQ_CODEL \
-            -e CONFIG_NET_SCH_CAKE \
-            -e CONFIG_DEFAULT_FQ_CODEL \
             -e CONFIG_ZRAM \
-            -e CONFIG_ZSMALLOC \
-            -e CONFIG_ZSMALLOC_STAT \
-            -e CONFIG_ZSWAP \
-            -e CONFIG_ZPOOL \
-            -e CONFIG_Z3FOLD \
-            -e CONFIG_FRONTSWAP \
             -e CONFIG_ZSTD_COMPRESS \
             -e CONFIG_ZSTD_DECOMPRESS \
             -e CONFIG_CRYPTO_ZSTD \
@@ -93,96 +70,22 @@ jobs:
             -e CONFIG_LRU_GEN_ENABLED \
             -e CONFIG_IOSCHED_BFQ \
             -e CONFIG_BFQ_GROUP_IOSCHED \
-            -e CONFIG_BLK_DEV_NBD \
-            -e CONFIG_F2FS_FS_COMPRESSION \
-            -e CONFIG_F2FS_FS_ZSTD \
-            -e CONFIG_F2FS_FS_LZ4HC \
             -e CONFIG_EXFAT_FS \
             -e CONFIG_NTFS3_FS \
             -e CONFIG_NTFS3_LZX_XPRESS \
-            -e CONFIG_BTRFS_FS \
-            -e CONFIG_XFS_FS \
-            -e CONFIG_SQUASHFS \
-            -e CONFIG_SQUASHFS_ZSTD \
             -e CONFIG_ISO9660_FS \
             -e CONFIG_UDF_FS \
-            -e CONFIG_ECRYPT_FS \
-            -e CONFIG_CIFS \
-            -e CONFIG_CIFS_SMB2 \
-            -e CONFIG_NFS_FS \
-            -e CONFIG_JOYSTICK_XPAD \
-            -e CONFIG_HID_SONY \
-            -e CONFIG_HID_NINTENDO \
-            -e CONFIG_HID_LOGITECH \
-            -e CONFIG_HID_LOGITECH_DJ \
-            -e CONFIG_HID_STEAM \
-            -e CONFIG_USB_CONFIGFS_F_HID \
             -e CONFIG_USB_NET_DRIVERS \
             -e CONFIG_USB_RTL8152 \
-            -e CONFIG_USB_NET_AX88179_178A \
             -e CONFIG_USB_NET_CDC_NCM \
-            -e CONFIG_USB_NET_CDC_EEM \
-            -e CONFIG_USB_NET_RNDIS_HOST \
-            -e CONFIG_USB_SERIAL \
-            -e CONFIG_USB_SERIAL_CH341 \
-            -e CONFIG_USB_SERIAL_CP210X \
-            -e CONFIG_USB_SERIAL_FTDI_SIO \
-            -e CONFIG_USB_ACM \
-            -e CONFIG_NETDEVICES \
-            -e CONFIG_WLAN \
-            -e CONFIG_CFG80211 \
-            -e CONFIG_CFG80211_WEXT \
-            -e CONFIG_MAC80211 \
-            -e CONFIG_WLAN_VENDOR_ATH \
-            -e CONFIG_ATH9K_HTC \
-            -e CONFIG_WLAN_VENDOR_MEDIATEK \
-            -e CONFIG_MT7601U \
-            -e CONFIG_MT76x0U \
-            -e CONFIG_MT76x2U \
-            -e CONFIG_MT7663U \
-            -e CONFIG_WLAN_VENDOR_RALINK \
-            -e CONFIG_RT2800USB \
-            -e CONFIG_WLAN_VENDOR_REALTEK \
-            -e CONFIG_RTL8XXXU \
-            -e CONFIG_RTW88 \
-            -e CONFIG_RTW88_8822BU \
-            -e CONFIG_RTW88_8822CU \
-            -e CONFIG_BT_HCIBTUSB \
-            -e CONFIG_BT_HCIBTUSB_RTL \
-            -e CONFIG_BT_HCIBTUSB_MTK \
-            -e CONFIG_MEDIA_SUPPORT \
-            -e CONFIG_MEDIA_USB_SUPPORT \
-            -e CONFIG_USB_VIDEO_CLASS \
-            -e CONFIG_MEDIA_DIGITAL_TV_SUPPORT \
-            -e CONFIG_DVB_USB_V2 \
-            -e CONFIG_DVB_USB_RTL28XXU \
-            -e CONFIG_CAN \
-            -e CONFIG_CAN_DEV \
-            -e CONFIG_CAN_SLCAN \
-            -e CONFIG_CAN_GS_USB \
-            -e CONFIG_NAMESPACES \
-            -e CONFIG_USER_NS \
-            -e CONFIG_PID_NS \
-            -e CONFIG_NET_NS \
-            -e CONFIG_IPC_NS \
-            -e CONFIG_UTS_NS \
-            -e CONFIG_CGROUP_DEVICE \
-            -e CONFIG_BRIDGE \
-            -e CONFIG_VETH \
-            -e CONFIG_OVERLAY_FS \
-            -e CONFIG_VIRTUALIZATION \
-            -e CONFIG_KVM
-          sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-RedFox-AbsoluteMax"/g' arch/arm64/configs/gki_defconfig || true
+            -e CONFIG_JOYSTICK_XPAD \
+            -e CONFIG_HID_SONY \
+            -e CONFIG_HID_NINTENDO
+          sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-RedFox-MaxOut"/g' arch/arm64/configs/gki_defconfig || true
 
       - name: Compile GKI Kernel
         run: |
-          cd ~/gki_build
-          CLANG_BIN=$(find "$PWD" -type d -path "*/clang/host/linux-x86/clang-*/bin" | sort -V | tail -n 1)
-          echo "Using Clang: $CLANG_BIN"
-          export ARCH=arm64
-          export SUBARCH=arm64
-          export PATH="$CLANG_BIN:$PWD/prebuilts/build-tools/linux-x86/bin:$PATH"
-          cd common
+          cd ~/gki_build/common
           make O=../out ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CC=clang LLVM=1 LLVM_IAS=1 gki_defconfig
           make O=../out ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CC=clang LLVM=1 LLVM_IAS=1 -j$(nproc --all) Image || make O=../out ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CC=clang LLVM=1 LLVM_IAS=1 -j1 Image
 
@@ -195,13 +98,13 @@ jobs:
           sed -i 's/is_slot_device=0/is_slot_device=auto/g' ~/AnyKernel3/anykernel.sh
           sed -i 's/block=\/dev\/block\/platform\/omap\/omap_hsmmc.0\/by-name\/boot;/block=auto;/g' ~/AnyKernel3/anykernel.sh
           cd ~/AnyKernel3
-          zip -r9 ~/RedFox-AbsoluteMax-GKI-5.10.237-TecnoLI6.zip * -x .git README.md *placeholder
+          zip -r9 ~/RedFox-GKI-5.10.237-KernelSU-Next-MaxOut-TecnoLI6.zip * -x .git README.md *placeholder
           mkdir -p /tmp/kernel_out
-          cp ~/RedFox-AbsoluteMax-GKI-5.10.237-TecnoLI6.zip ~/gki_build/out/arch/arm64/boot/Image /tmp/kernel_out/
+          cp ~/RedFox-GKI-5.10.237-KernelSU-Next-MaxOut-TecnoLI6.zip ~/gki_build/out/arch/arm64/boot/Image /tmp/kernel_out/
           ls -lh /tmp/kernel_out/
 
       - name: Upload Kernel & AnyKernel3 Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: RedFox-AbsoluteMax-GKI-5.10.237-Tecno-Pova-6-Neo
+          name: RedFox-GKI-5.10.237-MaxOut-Universal
           path: /tmp/kernel_out/
