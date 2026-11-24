@@ -80,8 +80,23 @@ jobs:
             -e CONFIG_NTFS3_LZX_XPRESS \
             -e CONFIG_JOYSTICK_XPAD \
             -e CONFIG_HID_SONY \
-            -e CONFIG_HID_NINTENDO
-          sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-RedFox-Ultimate"/g' arch/arm64/configs/gki_defconfig || true
+            -e CONFIG_HID_NINTENDO \
+            -e CONFIG_IOSCHED_BFQ \
+            -e CONFIG_BFQ_GROUP_IOSCHED \
+            -e CONFIG_NET_SCH_FQ_CODEL \
+            -e CONFIG_NET_SCH_CAKE \
+            -e CONFIG_DEFAULT_FQ_CODEL \
+            -e CONFIG_NETFILTER_XT_TARGET_TPROXY \
+            -e CONFIG_NETFILTER_XT_TARGET_CONNMARK \
+            -e CONFIG_NETFILTER_XT_MATCH_CONNMARK \
+            -e CONFIG_LZ4HC_COMPRESS \
+            -e CONFIG_CRYPTO_LZ4HC \
+            -e CONFIG_USB_NET_DRIVERS \
+            -e CONFIG_USB_RTL8152 \
+            -e CONFIG_USB_NET_CDC_NCM \
+            -e CONFIG_ISO9660_FS \
+            -e CONFIG_UDF_FS
+          sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-RedFox-MaxOut"/g' arch/arm64/configs/gki_defconfig || true
 
       - name: Compile GKI Kernel
         run: |
