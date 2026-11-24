@@ -1,4 +1,4 @@
-name: Build Absolute Max GKI Kernel (5.10.237-android12-9)
+name: Build Absolute Max GKI Kernel (5.10.275-android12-9)
 
 on:
   workflow_dispatch:
@@ -86,7 +86,8 @@ jobs:
       - name: Compile GKI Kernel
         run: |
           cd ~/gki_build/common
-          make O=../out ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CC=clang LLVM=1 LLVM_IAS=1 gki_defconfig
+          touch .scmversion
+          make O=../out LOCALVERSION="-android12-9-RedFox-MaxOut" ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CC=clang LLVM=1 LLVM_IAS=1 gki_defconfig
           make O=../out ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CC=clang LLVM=1 LLVM_IAS=1 -j$(nproc --all) Image || make O=../out ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CC=clang LLVM=1 LLVM_IAS=1 -j1 Image
 
       - name: Package AnyKernel3 Zip
@@ -98,13 +99,13 @@ jobs:
           sed -i 's/is_slot_device=0/is_slot_device=auto/g' ~/AnyKernel3/anykernel.sh
           sed -i 's/block=\/dev\/block\/platform\/omap\/omap_hsmmc.0\/by-name\/boot;/block=auto;/g' ~/AnyKernel3/anykernel.sh
           cd ~/AnyKernel3
-          zip -r9 ~/RedFox-GKI-5.10.237-KernelSU-Next-MaxOut-TecnoLI6.zip * -x .git README.md *placeholder
+          zip -r9 ~/RedFox-GKI-5.10.275-KernelSU-Next-MaxOut-TecnoLI6.zip * -x .git README.md *placeholder
           mkdir -p /tmp/kernel_out
-          cp ~/RedFox-GKI-5.10.237-KernelSU-Next-MaxOut-TecnoLI6.zip ~/gki_build/out/arch/arm64/boot/Image /tmp/kernel_out/
+          cp ~/RedFox-GKI-5.10.275-KernelSU-Next-MaxOut-TecnoLI6.zip ~/gki_build/out/arch/arm64/boot/Image /tmp/kernel_out/
           ls -lh /tmp/kernel_out/
 
       - name: Upload Kernel & AnyKernel3 Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: RedFox-GKI-5.10.237-MaxOut-Universal
+          name: RedFox-GKI-5.10.275-MaxOut-Universal
           path: /tmp/kernel_out/
