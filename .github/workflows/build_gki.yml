@@ -24,7 +24,7 @@ jobs:
       - name: Install Build Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y repo git-core gnupg flex bison build-essential zip curl zlib1g-dev libc6-dev-i386 libncurses5 x11proto-core-dev libx11-dev lib32z1-dev libgl1-mesa-dev libxml2-utils xsltproc unzip fontconfig python3 python-is-python3 cpio bc libssl-dev libelf-dev dwarves ccache zstd lz4
+          sudo apt-get install -y repo clang lld llvm git-core gnupg flex bison build-essential zip curl zlib1g-dev libc6-dev-i386 libncurses5 x11proto-core-dev libx11-dev lib32z1-dev libgl1-mesa-dev libxml2-utils xsltproc unzip fontconfig python3 python-is-python3 cpio bc libssl-dev libelf-dev dwarves ccache zstd lz4
 
       - name: Sync Google AOSP GKI android12-5.10 & Prebuilt Clang
         run: |
@@ -90,8 +90,6 @@ jobs:
           cd ~/gki_build
           export ARCH=arm64
           export SUBARCH=arm64
-          CLANG_BIN=$(find "$PWD/prebuilts/clang/host/linux-x86" -maxdepth 2 -name "ld.lld" -exec dirname {} \; | head -n 1)
-          echo "Detected AOSP Clang bin: $CLANG_BIN"
           export PATH="$CLANG_BIN:$PWD/prebuilts/build-tools/linux-x86/bin:$PATH"
           cd common
           make O=../out ARCH=arm64 CC=clang LLVM=1 LLVM_IAS=1 gki_defconfig
