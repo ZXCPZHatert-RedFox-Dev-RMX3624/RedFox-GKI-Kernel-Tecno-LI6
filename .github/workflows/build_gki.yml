@@ -36,14 +36,11 @@ jobs:
           repo init -u "$MANIFEST_URL" -b common-android12-5.10-lts --depth=1
           repo sync -c --no-tags --no-clone-bundle -j$(nproc --all)
 
-      - name: Integrate KernelSU-Next & SUSFS
         run: |
           cd ~/gki_build/common
           KSU_URL=$(python3 -c 'print("https://" + "github" + ".com/rifsxd/KernelSU-Next.git")')
-          SUSFS_URL=$(python3 -c 'print("https://" + "gitlab" + ".com/simonpunk/susfs4ksu.git")')
           git clone --depth=1 "$KSU_URL" KernelSU-Next
           bash KernelSU-Next/kernel/setup.sh
-          git clone --depth=1 "$SUSFS_URL" -b gki-android12-5.10 ~/susfs4ksu || true
           if [ -d ~/susfs4ksu/kernel_patches ]; then
             cp -r ~/susfs4ksu/kernel_patches/fs/* fs/ || true
             cp -r ~/susfs4ksu/kernel_patches/include/linux/* include/linux/ || true
@@ -65,14 +62,6 @@ jobs:
             -e CONFIG_POSIX_MQUEUE \
             -e CONFIG_TMPFS_XATTR \
             -e CONFIG_KSU \
-            -e CONFIG_KSU_SUSFS \
-            -e CONFIG_KSU_SUSFS_SUS_PATH \
-            -e CONFIG_KSU_SUSFS_SUS_MOUNT \
-            -e CONFIG_KSU_SUSFS_SUS_KSTAT \
-            -e CONFIG_KSU_SUSFS_SPOOF_UNAME \
-            -e CONFIG_KSU_SUSFS_ENABLE_LOG \
-            -e CONFIG_KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS \
-            -e CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG \
             -e CONFIG_TCP_CONG_ADVANCED \
             -e CONFIG_TCP_CONG_BBR \
             -e CONFIG_TCP_CONG_WESTWOOD \
@@ -205,7 +194,6 @@ jobs:
           sed -i 's/do.devicecheck=1/do.devicecheck=0/g' ~/AnyKernel3/anykernel.sh
           sed -i 's/is_slot_device=0/is_slot_device=auto/g' ~/AnyKernel3/anykernel.sh
           sed -i 's/block=\/dev\/block\/platform\/omap\/omap_hsmmc.0\/by-name\/boot;/block=auto;/g' ~/AnyKernel3/anykernel.sh
-          sed -i 's/kernel.string=.*/kernel.string=RedFox-AbsoluteMax GKI 5.10.237 (KernelSU-Next + SUSFS) for Tecno Pova 6 Neo/g' ~/AnyKernel3/anykernel.sh
           cd ~/AnyKernel3
           zip -r9 ~/RedFox-AbsoluteMax-GKI-5.10.237-TecnoLI6.zip * -x .git README.md *placeholder
           mkdir -p /tmp/kernel_out
