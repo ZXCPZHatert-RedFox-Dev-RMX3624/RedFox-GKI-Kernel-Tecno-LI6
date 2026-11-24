@@ -90,8 +90,8 @@ jobs:
           export SUBARCH=arm64
           export PATH="$CLANG_BIN:$PWD/prebuilts/build-tools/linux-x86/bin:$PATH"
           cd common
-          make O=../out ARCH=arm64 CC=clang LLVM=1 LLVM_IAS=1 gki_defconfig
-          make O=../out ARCH=arm64 CC=clang LLVM=1 LLVM_IAS=1 -j$(nproc --all) Image || make O=../out ARCH=arm64 CC=clang LLVM=1 LLVM_IAS=1 -j1 Image
+          make O=../out ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CC=clang LLVM=1 LLVM_IAS=1 gki_defconfig
+          make O=../out ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CC=clang LLVM=1 LLVM_IAS=1 -j$(nproc --all) Image || make O=../out ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CC=clang LLVM=1 LLVM_IAS=1 -j1 Image
 
       - name: Package AnyKernel3 Zip
         run: |
