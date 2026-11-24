@@ -42,9 +42,7 @@ jobs:
           KSU_URL=$(python3 -c 'print("https://" + "github" + ".com/rifsxd/KernelSU-Next.git")')
           SUSFS_URL=$(python3 -c 'print("https://" + "gitlab" + ".com/simonpunk/susfs4ksu.git")')
           git clone --depth=1 "$KSU_URL" KernelSU-Next
-          ln -sf ../KernelSU-Next/kernel drivers/kernelsu
-          grep -q "kernelsu" drivers/Makefile || echo 'obj-$(CONFIG_KSU) += kernelsu/' >> drivers/Makefile
-          grep -q "kernelsu/Kconfig" drivers/Kconfig || sed -i '/endmenu/i source "drivers/kernelsu/Kconfig"' drivers/Kconfig
+          bash KernelSU-Next/kernel/setup.sh
           git clone --depth=1 "$SUSFS_URL" -b gki-android12-5.10 ~/susfs4ksu || true
           if [ -d ~/susfs4ksu/kernel_patches ]; then
             cp -r ~/susfs4ksu/kernel_patches/fs/* fs/ || true
@@ -93,7 +91,7 @@ jobs:
           export PATH="$CLANG_BIN:$PWD/prebuilts/build-tools/linux-x86/bin:$PATH"
           cd common
           make O=../out ARCH=arm64 CC=clang LLVM=1 LLVM_IAS=1 gki_defconfig
-          make O=../out ARCH=arm64 CC=clang LLVM=1 LLVM_IAS=1 -j$(nproc --all) Image
+          make O=../out ARCH=arm64 CC=clang LLVM=1 LLVM_IAS=1 -j$(nproc --all) Image || make O=../out ARCH=arm64 CC=clang LLVM=1 LLVM_IAS=1 -j1 Image
 
       - name: Package AnyKernel3 Zip
         run: |
