@@ -90,7 +90,9 @@ jobs:
           cd ~/gki_build
           export ARCH=arm64
           export SUBARCH=arm64
-          export PATH="$PWD/prebuilts/clang/host/linux-x86/clang-r416183b/bin:$PWD/prebuilts/build-tools/linux-x86/bin:$PATH"
+          CLANG_BIN=$(find "$PWD/prebuilts/clang/host/linux-x86" -maxdepth 2 -name "ld.lld" -exec dirname {} \; | head -n 1)
+          echo "Detected AOSP Clang bin: $CLANG_BIN"
+          export PATH="$CLANG_BIN:$PWD/prebuilts/build-tools/linux-x86/bin:$PATH"
           cd common
           make O=../out ARCH=arm64 CC=clang LLVM=1 LLVM_IAS=1 gki_defconfig
           make O=../out ARCH=arm64 CC=clang LLVM=1 LLVM_IAS=1 -j$(nproc --all) Image
