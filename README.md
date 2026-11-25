@@ -57,3 +57,28 @@
 
 - 🦊 **[RMX3624-GKI-5.4-Kernel](https://github.com)** — флагманское GKI 5.4 ядро для Realme C30 / C33 (`RMX3624`) с аппаратным бустом яркости `4095`.
 - 📱 **[RedFox-Manager](https://github.com)** — универсальное Android-приложение на Kotlin для мониторинга температуры, напряжения батареи, RAM и управления системой.
+
+---
+
+## 🔄 Подробная инструкция: Чистая установка прошивки / GSI (Wipe Data + возврат ядра RedFox)
+
+Если вы планируете сделать полный сброс данных (**Wipe Data / Factory Reset**) или установить новую прошивку / GSI на **Tecno Spark 20 (`LI6`)**, придерживайтесь безопасного трёхэтапного цикла через **[RedFox-Flasher](https://github.com)** или `fastboot`:
+
+1. **Этап 1 — Временный возврат стокового `boot` (для работы Stock Recovery и `fastbootd`):**
+   - Переведите смартфон в режим **`Bootloader (Fastboot)`** (`adb reboot bootloader`).
+   - Временно прошейте ваш резервный стоковый образ `boot_stock.img`:
+     ```bash
+     fastboot flash boot_a boot_stock.img
+     fastboot flash boot_b boot_stock.img
+     ```
+2. **Этап 2 — Очистка памяти (`Wipe Data`) и прошивка системы:**
+   - Перезагрузите смартфон в рекавери (`fastboot reboot recovery`), выполните **Wipe Data / Factory Reset** и при необходимости прошейте новый образ системы в режиме `fastbootd` (`fastboot flash system system.img`).
+   - После завершения прошивки перезагрузите устройство обратно в **`Bootloader (Fastboot)`** (`fastboot reboot bootloader`).
+3. **Этап 3 — Установка кастомного ядра RedFox и запуск:**
+   - Прошейте подписанный образ **`boot_redfox_li6.img`** и запустите Android:
+     ```bash
+     fastboot flash boot_a boot_redfox_li6.img
+     fastboot flash boot_b boot_redfox_li6.img
+     fastboot reboot
+     ```
+   - После загрузки откройте **KernelSU Manager** и проверьте статус работы ядра.
