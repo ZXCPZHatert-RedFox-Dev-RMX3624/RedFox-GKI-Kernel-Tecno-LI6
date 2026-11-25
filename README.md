@@ -1,6 +1,6 @@
 # 🦊 RedFox-GKI-Kernel-Tecno-LI6 (`RedFox-Ultimate`)
 
-> **Кастомное GKI-ядро для смартфона Tecno Spark 20 (`LI6`, чипсет MediaTek Helio G85 / `mt6768`) с нативной поддержкой `KernelSU + SuSFS`, оптимизацией сетевого стека `TCP BBR` и ускорением работы памяти `ZRAM ZSTD`.**
+> **Кастомное GKI-ядро для смартфона Tecno Pova 6 Neo (`LI6`, чипсет MediaTek Helio G99 / `mt6768`) с нативной поддержкой `KernelSU + SuSFS`, оптимизацией сетевого стека `TCP BBR` и ускорением работы памяти `ZRAM ZSTD`.**
 
 > [!CAUTION]
 > **ОТКАЗ ОТ ОТВЕТСТВЕННОСТИ (DISCLAIMER):**
@@ -31,7 +31,7 @@
 ## 🛠️ Инструкция по установке
 
 ### Шаг 1. Обязательное резервное копирование
-Перед любыми манипуляциями **обязательно снимите бэкап** разделов `boot_a`, `boot_b`, `vendor_boot` и `vbmeta` с вашего **Tecno Spark 20 (`LI6`)** (через `mtkclient`, `fastboot` или `adb shell dd` при наличии временного рута).
+Перед любыми манипуляциями **обязательно снимите бэкап** разделов `boot_a`, `boot_b`, `vendor_boot` и `vbmeta` с вашего **Tecno Pova 6 Neo (`LI6`)** (через `mtkclient`, `fastboot` или `adb shell dd` при наличии временного рута).
 
 ### Шаг 2. Перепаковка (если в релизе только `Image.gz`) или подготовка `boot.img`
 1. Распакуйте ваш стоковый `boot.img` с помощью `magiskboot` или `unpack_bootimg`.
@@ -39,7 +39,7 @@
 3. Соберите новый `boot_redfox_li6.img` и при необходимости подпишите его через `avbtool`.
 
 ### Шаг 3. Прошивка через `Fastboot`
-1. Переведите **Tecno Spark 20 (`LI6`)** в режим **`Bootloader (Fastboot)`**:
+1. Переведите **Tecno Pova 6 Neo (`LI6`)** в режим **`Bootloader (Fastboot)`**:
    ```bash
    adb reboot bootloader
    ```
@@ -62,7 +62,7 @@
 
 ## 🔄 Подробная инструкция: Чистая установка прошивки / GSI (Wipe Data + возврат ядра RedFox)
 
-Если вы планируете сделать полный сброс данных (**Wipe Data / Factory Reset**) или установить новую прошивку / GSI на **Tecno Spark 20 (`LI6`)**, придерживайтесь безопасного трёхэтапного цикла через **[RedFox-Flasher](https://github.com)** или `fastboot`:
+Если вы планируете сделать полный сброс данных (**Wipe Data / Factory Reset**) или установить новую прошивку / GSI на **Tecno Pova 6 Neo (`LI6`)**, придерживайтесь безопасного трёхэтапного цикла через **[RedFox-Flasher](https://github.com)** или `fastboot`:
 
 1. **Этап 1 — Временный возврат стокового `boot` (для работы Stock Recovery и `fastbootd`):**
    - Переведите смартфон в режим **`Bootloader (Fastboot)`** (`adb reboot bootloader`).
